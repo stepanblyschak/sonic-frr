@@ -3625,8 +3625,7 @@ bool bgp_update_martian_nexthop(struct bgp *bgp, afi_t afi, safi_t safi,
 
 	/* If NEXT_HOP is present, validate it. */
 	if (attr->flag & ATTR_FLAG_BIT(BGP_ATTR_NEXT_HOP)) {
-		if (attr->nexthop.s_addr == INADDR_ANY
-		    || IPV4_CLASS_DE(ntohl(attr->nexthop.s_addr))
+		if (IPV4_CLASS_DE(ntohl(attr->nexthop.s_addr))
 		    || bgp_nexthop_self(bgp, afi, type, stype, attr, dest))
 			return true;
 	}
