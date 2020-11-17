@@ -743,6 +743,9 @@ struct bgp {
 	/* Weighted ECMP related config. */
 	enum bgp_link_bw_handling lb_handling;
 
+	/* dscp value for tcp sessions */
+	uint8_t tcp_dscp;
+
 	/* Process Queue for handling routes */
 	struct work_queue *process_queue;
 

@@ -3229,6 +3229,7 @@ static struct bgp *bgp_create(as_t *as, const char *name,
 	bgp->evpn_info = XCALLOC(MTYPE_BGP_EVPN_INFO,
 				 sizeof(struct bgp_evpn_info));
 
+	bgp->tcp_dscp = IPTOS_PREC_INTERNETCONTROL;
 	bgp_evpn_init(bgp);
 	bgp_evpn_vrf_es_init(bgp);
 	bgp_pbr_init(bgp);

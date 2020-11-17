@@ -743,11 +743,9 @@ int bgp_connect(struct peer *peer)
 #ifdef IPTOS_PREC_INTERNETCONTROL
 	frr_with_privs(&bgpd_privs) {
 		if (sockunion_family(&peer->su) == AF_INET)
-			setsockopt_ipv4_tos(peer->fd,
-					    IPTOS_PREC_INTERNETCONTROL);
+			setsockopt_ipv4_tos(peer->fd, peer->bgp->tcp_dscp);
 		else if (sockunion_family(&peer->su) == AF_INET6)
-			setsockopt_ipv6_tclass(peer->fd,
-					       IPTOS_PREC_INTERNETCONTROL);
+			setsockopt_ipv6_tclass(peer->fd, peer->bgp->tcp_dscp);
 	}
 #endif
 
@@ -824,10 +822,9 @@ static int bgp_listener(int sock, struct sockaddr *sa, socklen_t salen,
 
 #ifdef IPTOS_PREC_INTERNETCONTROL
 		if (sa->sa_family == AF_INET)
-			setsockopt_ipv4_tos(sock, IPTOS_PREC_INTERNETCONTROL);
+			setsockopt_ipv4_tos(sock, bgp->tcp_dscp);
 		else if (sa->sa_family == AF_INET6)
-			setsockopt_ipv6_tclass(sock,
-					       IPTOS_PREC_INTERNETCONTROL);
+			setsockopt_ipv6_tclass(sock, bgp->tcp_dscp);
 #endif
 
 		sockopt_v6only(sa->sa_family, sock);

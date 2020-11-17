@@ -1558,6 +1558,42 @@ DEFUN (no_router_bgp,
 	return CMD_SUCCESS;
 }
 
+/* bgp session-dscp */
+
+DEFUN (bgp_session_dscp,
+       bgp_session_dscp_cmd,
+       "bgp session-dscp DSCP",
+        BGP_STR
+       "Override default (C0) bgp TCP session DSCP value\n"
+       "Manually configured dscp parameter\n")
+{
+	struct bgp *bgp = VTY_GET_CONTEXT(bgp);
+
+	uint8_t value = (uint8_t)strtol(argv[2]->arg, NULL, 16);
+	if ((value == 0 && errno == EINVAL) || (value > 0x3f))
+	{
+		vty_out (vty, "%% Malformed bgp session-dscp parameter\n");
+		return CMD_WARNING_CONFIG_FAILED;
+	}
+
+	bgp->tcp_dscp = value << 2;
+
+	return CMD_SUCCESS;
+}
+
+DEFUN (no_bgp_session_dscp,
+       no_bgp_session_dscp_cmd,
+       "no bgp session-dscp",
+       NO_STR
+       BGP_STR
+       "Override default (C0) bgp tcp session ip dscp value\n")
+{
+	struct bgp *bgp = VTY_GET_CONTEXT(bgp);
+
+	bgp->tcp_dscp = IPTOS_PREC_INTERNETCONTROL;
+
+	return CMD_SUCCESS;
+}
 
 /* BGP router-id.  */
 
@@ -17053,6 +17089,10 @@ int bgp_config_write(struct vty *vty)
 		if (CHECK_FLAG(bgp->flags, BGP_FLAG_NO_FAST_EXT_FAILOVER))
 			vty_out(vty, " no bgp fast-external-failover\n");
 
+		/* BGP session DSCP value */
+		if (bgp->tcp_dscp != IPTOS_PREC_INTERNETCONTROL)
+			vty_out(vty, " bgp session-dscp %02X\n", bgp->tcp_dscp >> 2);
+
 		/* BGP router ID. */
 		if (bgp->router_id_static.s_addr != INADDR_ANY)
 			vty_out(vty, " bgp router-id %pI4\n",
@@ -17661,6 +17701,10 @@ void bgp_vty_init(void)
 
 	/* "no router bgp" commands. */
 	install_element(CONFIG_NODE, &no_router_bgp_cmd);
+
+	/* "bgp session-dscp command */
+	install_element (BGP_NODE, &bgp_session_dscp_cmd);
+	install_element (BGP_NODE, &no_bgp_session_dscp_cmd);
 
 	/* "bgp router-id" commands. */
 	install_element(BGP_NODE, &bgp_router_id_cmd);
