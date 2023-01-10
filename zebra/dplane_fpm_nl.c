@@ -605,7 +605,10 @@ static int fpm_read(struct thread *t)
 				    hdr, 0, false, ctx) != 1) {
 				dplane_ctx_fini(&ctx);
 				stream_pulldown(fnc->ibuf);
-				return 0;
+				/*
+				 * Let's continue to read other messages
+				 * Even if we ignore this one.
+				 */
 			}
 			break;
 		default:
