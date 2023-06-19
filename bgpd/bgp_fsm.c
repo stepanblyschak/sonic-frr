@@ -786,9 +786,9 @@ static int bgp_graceful_restart_timer_expire(struct thread *thread)
 
 	peer = THREAD_ARG(thread);
 
-	if (bgp_debug_neighbor_events(peer)) {
-		zlog_debug("%s graceful restart timer expired", peer->host);
-		zlog_debug("%s graceful restart stalepath timer stopped",
+	if (peer) {
+		zlog_info("%s graceful restart timer expired", peer->host);
+		zlog_info("%s graceful restart stalepath timer stopped",
 			   peer->host);
 	}
 
@@ -852,8 +852,8 @@ static int bgp_graceful_stale_timer_expire(struct thread *thread)
 
 	peer = THREAD_ARG(thread);
 
-	if (bgp_debug_neighbor_events(peer))
-		zlog_debug("%s graceful restart stalepath timer expired",
+	if (peer)
+		zlog_info("%s graceful restart stalepath timer expired",
 			   peer->host);
 
 	/* NSF delete stale route */
@@ -1427,20 +1427,18 @@ int bgp_stop(struct peer *peer)
 		/* graceful restart */
 		if (peer->t_gr_stale) {
 			BGP_TIMER_OFF(peer->t_gr_stale);
-			if (bgp_debug_neighbor_events(peer))
-				zlog_debug(
-					"%s graceful restart stalepath timer stopped",
-					peer->host);
+			zlog_info(
+				"%s graceful restart stalepath timer stopped",
+				peer->host);
 		}
 		if (CHECK_FLAG(peer->sflags, PEER_STATUS_NSF_WAIT)) {
-			if (bgp_debug_neighbor_events(peer)) {
-				zlog_debug(
-					"%s graceful restart timer started for %d sec",
-					peer->host, peer->v_gr_restart);
-				zlog_debug(
-					"%s graceful restart stalepath timer started for %d sec",
-					peer->host, peer->bgp->stalepath_time);
-			}
+			zlog_info(
+				"%s graceful restart timer started for %d sec",
+				peer->host, peer->v_gr_restart);
+			zlog_info(
+				"%s graceful restart stalepath timer started for %d sec",
+				peer->host, peer->bgp->stalepath_time);
+			
 			BGP_TIMER_ON(peer->t_gr_restart,
 				     bgp_graceful_restart_timer_expire,
 				     peer->v_gr_restart);
@@ -2205,18 +2203,16 @@ static int bgp_establish(struct peer *peer)
 		UNSET_FLAG(peer->sflags, PEER_STATUS_NSF_MODE);
 		if (peer->t_gr_stale) {
 			BGP_TIMER_OFF(peer->t_gr_stale);
-			if (bgp_debug_neighbor_events(peer))
-				zlog_debug(
-					"%s graceful restart stalepath timer stopped",
-					peer->host);
+			zlog_info(
+				"%s graceful restart stalepath timer stopped",
+				peer->host);
 		}
 	}
 
 	if (peer->t_gr_restart) {
 		BGP_TIMER_OFF(peer->t_gr_restart);
-		if (bgp_debug_neighbor_events(peer))
-			zlog_debug("%s graceful restart timer stopped",
-				   peer->host);
+		zlog_info("%s graceful restart timer stopped",
+				peer->host);
 	}
 
 	/* Reset uptime, turn on keepalives, send current table. */

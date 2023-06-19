@@ -2346,16 +2346,14 @@ void peer_nsf_stop(struct peer *peer)
 
 	if (peer->t_gr_restart) {
 		BGP_TIMER_OFF(peer->t_gr_restart);
-		if (bgp_debug_neighbor_events(peer))
-			zlog_debug("%s graceful restart timer stopped",
-				   peer->host);
+		zlog_info("%s graceful restart timer stopped",
+				peer->host);
 	}
 	if (peer->t_gr_stale) {
 		BGP_TIMER_OFF(peer->t_gr_stale);
-		if (bgp_debug_neighbor_events(peer))
-			zlog_debug(
-				"%s graceful restart stalepath timer stopped",
-				peer->host);
+		zlog_info(
+			"%s graceful restart stalepath timer stopped",
+			peer->host);
 	}
 	bgp_clear_route_all(peer);
 }
